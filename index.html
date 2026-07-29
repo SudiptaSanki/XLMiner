@@ -21,33 +21,49 @@
       </div>
     </header>
 
-    <!-- Main Input Card -->
+    <!-- Main Auto-Detection & Extract Card -->
     <section class="card" id="inputCard">
-      <div class="card__title">
-        Paste Google Sheets URL
+      
+      <!-- Detected Sheet Display -->
+      <div id="detectedSheetBox" class="detected-box">
+        <div class="detected-status">
+          <span class="status-indicator" id="statusIndicator"></span>
+          <span class="status-label" id="statusLabel">Checking active tab...</span>
+        </div>
+        <div class="detected-title" id="detectedTitle">Scanning browser tab...</div>
+        <div class="detected-url" id="detectedUrl"></div>
       </div>
 
-      <div class="input-group">
-        <div class="input-wrapper">
-          <input
-            type="url"
-            id="sheetUrl"
-            class="url-input"
-            placeholder="https://docs.google.com/spreadsheets/d/..."
-            autocomplete="off"
-            spellcheck="false"
-          >
-        </div>
-        <button id="extractBtn" class="btn-extract" type="button">
-          <span class="btn-extract__label">Extract</span>
-          <span class="btn-extract__spinner"></span>
+      <!-- Main Action Button -->
+      <button id="extractBtn" class="btn-extract btn-extract-primary" type="button" disabled>
+        <span class="btn-extract__label">Extract Sheet</span>
+        <span class="btn-extract__spinner"></span>
+      </button>
+
+      <!-- Optional Manual URL Toggle -->
+      <div class="manual-toggle-bar">
+        <button id="manualToggleBtn" class="manual-toggle-btn" type="button">
+          Paste custom URL
         </button>
+      </div>
+
+      <!-- Manual Input Wrapper (hidden by default unless toggled or no sheet detected) -->
+      <div id="manualInputWrapper" class="manual-input-wrapper hidden">
+        <input
+          type="url"
+          id="sheetUrl"
+          class="url-input"
+          placeholder="https://docs.google.com/spreadsheets/d/..."
+          autocomplete="off"
+          spellcheck="false"
+        >
       </div>
 
       <!-- Error Banner -->
       <div id="errorBanner" class="error-banner">
         <span id="errorMessage">An error occurred.</span>
       </div>
+
     </section>
 
     <!-- Sheet Tabs -->

@@ -1,8 +1,8 @@
 /**
  * XLMiner — Main App Controller
  *
- * Orchestrates the UI: handles user input, runs the extraction pipeline,
- * renders progress logs, data preview, and triggers download.
+ * Auto-detects Google Sheets on active browser tab and orchestrates
+ * extraction, rendering progress logs, data preview, and Excel download.
  */
 
 (() => {
@@ -14,6 +14,15 @@
     extractBtn: document.getElementById('extractBtn'),
     errorBanner: document.getElementById('errorBanner'),
     errorMessage: document.getElementById('errorMessage'),
+
+    detectedBox: document.getElementById('detectedSheetBox'),
+    statusIndicator: document.getElementById('statusIndicator'),
+    statusLabel: document.getElementById('statusLabel'),
+    detectedTitle: document.getElementById('detectedTitle'),
+    detectedUrl: document.getElementById('detectedUrl'),
+
+    manualToggleBtn: document.getElementById('manualToggleBtn'),
+    manualInputWrapper: document.getElementById('manualInputWrapper'),
 
     sheetTabsCard: document.getElementById('sheetTabsCard'),
     sheetTabs: document.getElementById('sheetTabs'),
@@ -39,6 +48,7 @@
     detectedSheets: [],
     selectedGid: null,
     spreadsheetId: null,
+    sheetDetected: false,
   };
 
   // ── Initialize ──
@@ -46,34 +56,90 @@
     els.extractBtn.addEventListener('click', handleExtract);
     els.downloadBtn.addEventListener('click', handleDownload);
 
-    // Allow Enter key on input
+    // Toggle custom manual URL input
+    els.manualToggleBtn.addEventListener('click', () => {
+      els.manualInputWrapper.classList.toggle('hidden');
+      if (!els.manualInputWrapper.classList.contains('hidden')) {
+        els.sheetUrl.focus();
+      }
+    });
+
+    // Manual input typing handler
+    els.sheetUrl.addEventListener('input', () => {
+      const val = els.sheetUrl.value.trim();
+      if (val.includes('docs.google.com/spreadsheets')) {
+        els.extractBtn.disabled = false;
+        hideError();
+      } else if (!state.sheetDetected) {
+        els.extractBtn.disabled = true;
+      }
+    });
+
+    // Allow Enter key on manual input
     els.sheetUrl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleExtract();
+      if (e.key === 'Enter' && !els.extractBtn.disabled) {
+        handleExtract();
+      }
     });
 
-    // Paste handler — auto-extract on paste
-    els.sheetUrl.addEventListener('paste', () => {
-      setTimeout(() => {
-        if (els.sheetUrl.value.includes('docs.google.com/spreadsheets')) {
-          els.sheetUrl.classList.add('pasted');
-          setTimeout(() => els.sheetUrl.classList.remove('pasted'), 300);
-        }
-      }, 50);
-    });
+    // Auto-detect URL & title from active tab
+    detectActiveTab();
+  }
 
-    // Auto-detect URL from active tab (Chrome Extension mode)
-    if (typeof chrome !== 'undefined' && chrome.tabs) {
+  /**
+   * Auto-detect if current active tab is a Google Sheet.
+   */
+  function detectActiveTab() {
+    if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.query) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const tab = tabs[0];
         if (tab && tab.url && tab.url.includes('docs.google.com/spreadsheets')) {
-          els.sheetUrl.value = tab.url;
-          els.sheetUrl.style.color = 'var(--accent-emerald-light)';
+          setSheetDetected(tab.url, tab.title);
+        } else {
+          setNoSheetDetected();
         }
       });
+    } else {
+      // Fallback for direct browser testing without extension API
+      setNoSheetDetected();
     }
+  }
 
-    // Focus input on load
-    els.sheetUrl.focus();
+  function setSheetDetected(url, rawTitle) {
+    state.sheetDetected = true;
+    els.sheetUrl.value = url;
+
+    // Format title
+    let cleanTitle = rawTitle ? rawTitle.replace(/\s*-\s*Google Sheets\s*/i, '').trim() : 'Google Sheet';
+    if (!cleanTitle) cleanTitle = 'Google Sheet';
+
+    els.statusIndicator.className = 'status-indicator status-indicator--active';
+    els.statusLabel.textContent = 'Sheet Detected';
+    els.detectedTitle.textContent = cleanTitle;
+    els.detectedUrl.textContent = truncateUrl(url);
+
+    els.extractBtn.disabled = false;
+  }
+
+  function setNoSheetDetected() {
+    state.sheetDetected = false;
+
+    els.statusIndicator.className = 'status-indicator status-indicator--none';
+    els.statusLabel.textContent = 'No Sheet Active';
+    els.detectedTitle.textContent = 'Open a Google Sheet tab';
+    els.detectedUrl.textContent = 'Or toggle custom URL below';
+
+    els.manualInputWrapper.classList.remove('hidden');
+    els.extractBtn.disabled = true;
+  }
+
+  function truncateUrl(url) {
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname;
+    } catch {
+      return url;
+    }
   }
 
   // ── Main Extract Handler ──
@@ -81,7 +147,6 @@
     if (state.isExtracting) return;
 
     const url = els.sheetUrl.value.trim();
-    // In extension mode, no proxy needed (background worker handles CORS)
     const proxyBase = '';
 
     // Validate
@@ -178,7 +243,6 @@
       tab.dataset.gid = sheet.gid;
 
       tab.addEventListener('click', () => {
-        // Deactivate all
         els.sheetTabs.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         state.selectedGid = sheet.gid;
@@ -200,7 +264,6 @@
     let html = '<thead><tr>';
     html += '<th class="row-num">#</th>';
 
-    // Column headers (A, B, C, ... AA, AB, etc.)
     for (let c = 0; c < totalCols; c++) {
       html += `<th>${getColumnLetter(c)}</th>`;
     }
@@ -234,8 +297,6 @@
     `;
 
     els.logList.appendChild(li);
-
-    // Scroll to bottom
     li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
