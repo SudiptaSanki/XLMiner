@@ -1,9 +1,8 @@
 /**
  * XLMiner — Content Script
  *
- * Injected into Google Sheets pages.
- * - On first visit: asks user permission before showing the overlay.
- * - Shows a floating "XLMiner" button with a toggle to hide it.
+ * - Injected into Google Sheets pages.
+ * - Shows a floating "XLMiner" button if enabled in the extension settings.
  * - Clicking the button opens the extension popup via chrome.action API.
  */
 
@@ -14,68 +13,20 @@
   if (!window.location.href.includes('/spreadsheets/d/')) return;
 
   const STORAGE_KEY_OVERLAY = 'xlminer_overlay_enabled';
-  const STORAGE_KEY_ASKED = 'xlminer_overlay_asked';
 
   /**
    * Check stored preference and either ask, inject, or skip.
    */
   function boot() {
-    chrome.storage.local.get([STORAGE_KEY_OVERLAY, STORAGE_KEY_ASKED], (data) => {
-      const asked = data[STORAGE_KEY_ASKED];
-      const enabled = data[STORAGE_KEY_OVERLAY];
-
-      if (!asked) {
-        // First time — ask permission
-        askPermission();
-      } else if (enabled === true) {
+    chrome.storage.local.get([STORAGE_KEY_OVERLAY], (data) => {
+      // Default is OFF — only inject if explicitly enabled by the user
+      if (data[STORAGE_KEY_OVERLAY] === true) {
         injectOverlay();
       }
-      // else: user turned it off, do nothing
     });
   }
 
-  /**
-   * Show a permission prompt asking if the user wants the overlay.
-   */
-  function askPermission() {
-    // Don't ask more than once per page load
-    if (document.getElementById('xlminer-permission-prompt')) return;
 
-    const prompt = document.createElement('div');
-    prompt.id = 'xlminer-permission-prompt';
-    prompt.innerHTML = `
-      <div class="xlminer-prompt-card">
-        <div class="xlminer-prompt-header">
-          <strong>XLMiner</strong>
-        </div>
-        <div class="xlminer-prompt-body">
-          Show a quick-access button on spreadsheet pages?
-        </div>
-        <div class="xlminer-prompt-actions">
-          <button class="xlminer-prompt-btn xlminer-prompt-yes">Enable</button>
-          <button class="xlminer-prompt-btn xlminer-prompt-no">No thanks</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(prompt);
-
-    prompt.querySelector('.xlminer-prompt-yes').addEventListener('click', () => {
-      chrome.storage.local.set({
-        [STORAGE_KEY_OVERLAY]: true,
-        [STORAGE_KEY_ASKED]: true,
-      });
-      prompt.remove();
-      injectOverlay();
-    });
-
-    prompt.querySelector('.xlminer-prompt-no').addEventListener('click', () => {
-      chrome.storage.local.set({
-        [STORAGE_KEY_OVERLAY]: false,
-        [STORAGE_KEY_ASKED]: true,
-      });
-      prompt.remove();
-    });
-  }
 
   /**
    * Inject the floating action button onto the page.

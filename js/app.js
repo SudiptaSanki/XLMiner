@@ -82,20 +82,43 @@
       }
     });
 
-    // Overlay toggle switch
+    // ── Preference Toggles ──
     const overlayToggle = document.getElementById('overlayToggle');
-    if (overlayToggle && typeof chrome !== 'undefined' && chrome.storage) {
-      // Load current preference
-      chrome.storage.local.get(['xlminer_overlay_enabled', 'xlminer_overlay_asked'], (data) => {
-        const enabled = data.xlminer_overlay_enabled !== false; // default true
-        overlayToggle.checked = enabled;
-      });
+    const autoDownloadToggle = document.getElementById('autoDownloadToggle');
+    const hasStorage = typeof chrome !== 'undefined' && chrome.storage;
 
-      // Save on change
+    if (hasStorage) {
+      // Load saved preferences
+      chrome.storage.local.get(
+        ['xlminer_overlay_enabled', 'xlminer_auto_download'],
+        (data) => {
+          // Overlay: default OFF
+          overlayToggle.checked = data.xlminer_overlay_enabled === true;
+          // Auto-download: default ON
+          autoDownloadToggle.checked = data.xlminer_auto_download !== false;
+        }
+      );
+
+      // Overlay toggle — save preference & reload the active sheet tab to apply
       overlayToggle.addEventListener('change', () => {
         chrome.storage.local.set({
           xlminer_overlay_enabled: overlayToggle.checked,
           xlminer_overlay_asked: true,
+        }, () => {
+          // Reload the active Google Sheets tab so the content script picks up the change
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const tab = tabs[0];
+            if (tab && tab.url && tab.url.includes('docs.google.com/spreadsheets')) {
+              chrome.tabs.reload(tab.id);
+            }
+          });
+        });
+      });
+
+      // Auto-download toggle — just save preference
+      autoDownloadToggle.addEventListener('change', () => {
+        chrome.storage.local.set({
+          xlminer_auto_download: autoDownloadToggle.checked,
         });
       });
     }
@@ -231,9 +254,18 @@
       showSection(els.downloadCard);
       updateProgress(100);
 
-      // Auto-scroll to download for large datasets
-      if (rowCount >= 10000) {
+      // Always auto-scroll to the download section after extraction
+      setTimeout(() => {
         els.downloadCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 200);
+
+      // Auto-download if preference is enabled
+      if (hasStorage) {
+        chrome.storage.local.get(['xlminer_auto_download'], (data) => {
+          if (data.xlminer_auto_download !== false) {
+            handleDownload();
+          }
+        });
       }
 
     } catch (err) {
