@@ -260,7 +260,7 @@
       }, 200);
 
       // Auto-download if preference is enabled
-      if (hasStorage) {
+      if (typeof chrome !== 'undefined' && chrome.storage) {
         chrome.storage.local.get(['xlminer_auto_download'], (data) => {
           if (data.xlminer_auto_download !== false) {
             handleDownload();
