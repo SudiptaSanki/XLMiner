@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XLMiner</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Background Effects -->
+  <div class="bg-effects" aria-hidden="true"></div>
+
+  <div class="app-container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="assets/logo.png" alt="XLMiner Logo" class="logo-icon" onerror="this.style.display='none'">
+        <h1 class="logo-text">XLMiner</h1>
+      </div>
+    </header>
+
+    <!-- Main Input Card -->
+    <section class="card" id="inputCard">
+      <div class="card__title">
+        Paste Google Sheets URL
+      </div>
+
+      <div class="input-group">
+        <div class="input-wrapper">
+          <input
+            type="url"
+            id="sheetUrl"
+            class="url-input"
+            placeholder="https://docs.google.com/spreadsheets/d/..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+        <button id="extractBtn" class="btn-extract" type="button">
+          <span class="btn-extract__label">Extract</span>
+          <span class="btn-extract__spinner"></span>
+        </button>
+      </div>
+
+      <!-- Error Banner -->
+      <div id="errorBanner" class="error-banner">
+        <span id="errorMessage">An error occurred.</span>
+      </div>
+    </section>
+
+    <!-- Sheet Tabs -->
+    <section class="card sheet-tabs-section" id="sheetTabsCard">
+      <div class="card__title">
+        Sheet Tabs
+      </div>
+      <div class="sheet-tabs" id="sheetTabs"></div>
+    </section>
+
+    <!-- Progress / Log -->
+    <section class="card progress-section" id="progressCard">
+      <div class="card__title">
+        Extraction Progress
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <ul class="log-list" id="logList"></ul>
+    </section>
+
+    <!-- Preview -->
+    <section class="card preview-section" id="previewCard">
+      <div class="preview-header">
+        <div class="card__title" style="margin-bottom:0">
+          Data Preview
+        </div>
+        <span class="preview-stats" id="previewStats"></span>
+      </div>
+      <div class="preview-scroll">
+        <table class="preview-table" id="previewTable"></table>
+      </div>
+    </section>
+
+    <!-- Download -->
+    <section class="card download-section" id="downloadCard">
+      <div class="success-banner visible">
+        Extraction complete — Excel file ready
+      </div>
+      <button id="downloadBtn" class="btn-download" type="button">
+        Download .xlsx
+      </button>
+      <div class="download-meta" id="downloadMeta"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer__links">
+        <a href="https://github.com/SudiptaSanki/XLMiner" target="_blank" rel="noopener" class="footer__link">GitHub</a>
+        <a href="https://github.com/SudiptaSanki/XLMiner/blob/main/LICENSE" target="_blank" rel="noopener" class="footer__link">MIT License</a>
+        <a href="https://github.com/SudiptaSanki/XLMiner/releases" target="_blank" rel="noopener" class="footer__link">v1.0.0 (Latest)</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Libraries -->
+  <script src="js/exceljs.min.js"></script>
+
+  <!-- App Modules -->
+  <script src="js/extractor.js"></script>
+  <script src="js/formatter.js"></script>
+  <script src="js/excelBuilder.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

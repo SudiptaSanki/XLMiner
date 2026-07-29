@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "XLMiner — Extract Blocked Google Sheets",
+  "short_name": "XLMiner",
+  "version": "1.0.0",
+  "description": "Extract & download any Google Sheet as a perfect Excel file — even when the download button is blocked by the owner. Preserves formatting, fonts, colors, and merged cells.",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://docs.google.com/spreadsheets/*"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    },
+    "default_title": "XLMiner — Extract Google Sheets"
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/spreadsheets/*"],
+      "js": ["js/content.js"],
+      "css": ["css/content-inject.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["https://docs.google.com/*"]
+    }
+  ]
+}

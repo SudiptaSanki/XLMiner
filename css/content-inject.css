@@ -1,0 +1,42 @@
+/* XLMiner — Content Script Injected Styles */
+
+#xlminer-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.xlminer-fab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #3b82f6, #10b981);
+  color: #fff;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 150ms ease, box-shadow 250ms ease;
+  user-select: none;
+}
+
+.xlminer-fab-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 28px rgba(59, 130, 246, 0.5), 0 3px 12px rgba(0, 0, 0, 0.25);
+}
+
+.xlminer-fab-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.xlminer-fab-icon {
+  font-size: 16px;
+}
+
+.xlminer-fab-label {
+  letter-spacing: 0.02em;
+}
