@@ -82,6 +82,24 @@
       }
     });
 
+    // Overlay toggle switch
+    const overlayToggle = document.getElementById('overlayToggle');
+    if (overlayToggle && typeof chrome !== 'undefined' && chrome.storage) {
+      // Load current preference
+      chrome.storage.local.get(['xlminer_overlay_enabled', 'xlminer_overlay_asked'], (data) => {
+        const enabled = data.xlminer_overlay_enabled !== false; // default true
+        overlayToggle.checked = enabled;
+      });
+
+      // Save on change
+      overlayToggle.addEventListener('change', () => {
+        chrome.storage.local.set({
+          xlminer_overlay_enabled: overlayToggle.checked,
+          xlminer_overlay_asked: true,
+        });
+      });
+    }
+
     // Auto-detect URL & title from active tab
     detectActiveTab();
   }
@@ -125,9 +143,9 @@
     state.sheetDetected = false;
 
     els.statusIndicator.className = 'status-indicator status-indicator--none';
-    els.statusLabel.textContent = 'No Sheet Active';
-    els.detectedTitle.textContent = 'Open a Google Sheet tab';
-    els.detectedUrl.textContent = 'Or toggle custom URL below';
+    els.statusLabel.textContent = 'No Sheet Detected';
+    els.detectedTitle.textContent = 'Navigate to a spreadsheet to extract';
+    els.detectedUrl.textContent = 'Or paste a custom URL below';
 
     els.manualInputWrapper.classList.remove('hidden');
     els.extractBtn.disabled = true;
@@ -207,10 +225,16 @@
       }
 
       // Step 5: Show download
+      const rowCount = result.rows?.length || 0;
       addLog('success', `Extraction complete — file size: ${XLExcelBuilder.formatFileSize(blob)}`);
-      els.downloadMeta.textContent = `${XLExcelBuilder.formatFileSize(blob)} • ${result.rows?.length || '?'} rows • Source: ${result.source || 'direct export'}`;
+      els.downloadMeta.textContent = `${XLExcelBuilder.formatFileSize(blob)} • ${rowCount} rows • Source: ${result.source || 'direct export'}`;
       showSection(els.downloadCard);
       updateProgress(100);
+
+      // Auto-scroll to download for large datasets
+      if (rowCount >= 10000) {
+        els.downloadCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
 
     } catch (err) {
       addLog('error', err.message);

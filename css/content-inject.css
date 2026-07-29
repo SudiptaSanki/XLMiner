@@ -1,11 +1,16 @@
 /* XLMiner — Content Script Injected Styles */
 
+/* ── Floating Action Button ── */
+
 #xlminer-fab {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 99999;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .xlminer-fab-btn {
@@ -13,30 +18,118 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #3b82f6, #10b981);
-  color: #fff;
+  background: #000000;
+  color: #ffffff;
   border-radius: 50px;
   cursor: pointer;
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 150ms ease, box-shadow 250ms ease;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: transform 150ms ease, box-shadow 250ms ease, background 150ms ease;
   user-select: none;
 }
 
 .xlminer-fab-btn:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 28px rgba(59, 130, 246, 0.5), 0 3px 12px rgba(0, 0, 0, 0.25);
+  background: #1a1a1a;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .xlminer-fab-btn:active {
   transform: translateY(0) scale(0.98);
 }
 
-.xlminer-fab-icon {
-  font-size: 16px;
+.xlminer-fab-close {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #a1a1aa;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease, color 150ms ease;
+  padding: 0;
+  line-height: 1;
 }
 
-.xlminer-fab-label {
-  letter-spacing: 0.02em;
+.xlminer-fab-close:hover {
+  background: rgba(239, 68, 68, 0.8);
+  color: #ffffff;
+}
+
+/* ── Permission Prompt ── */
+
+#xlminer-permission-prompt {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  animation: xlminer-fade-in 0.3s ease;
+}
+
+@keyframes xlminer-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.xlminer-prompt-card {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  max-width: 260px;
+  color: #ffffff;
+}
+
+.xlminer-prompt-header {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.xlminer-prompt-body {
+  font-size: 12px;
+  color: #a1a1aa;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.xlminer-prompt-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.xlminer-prompt-btn {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 150ms ease;
+}
+
+.xlminer-prompt-btn:hover {
+  opacity: 0.85;
+}
+
+.xlminer-prompt-yes {
+  background: #ffffff;
+  color: #000000;
+}
+
+.xlminer-prompt-no {
+  background: rgba(255, 255, 255, 0.08);
+  color: #a1a1aa;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }

@@ -5,7 +5,8 @@
   "version": "1.0.0",
   "description": "Extract & download any Google Sheet as a perfect Excel file — even when the download button is blocked by the owner. Preserves formatting, fonts, colors, and merged cells.",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
   "host_permissions": [
     "https://docs.google.com/spreadsheets/*"
